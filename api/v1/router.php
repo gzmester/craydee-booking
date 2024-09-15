@@ -48,7 +48,7 @@ $router->addRoute('GET', '/test', function ()  {
 });
 
 
-#********** http://localhost/craydee-booking/api/router.php/login **********#
+#********** http://localhost/craydee-booking/api/v1/router.php/login **********#
 $router->addRoute('POST', '/login', function () use ($userApi) {
     $data = json_decode(file_get_contents('php://input'), true);
 
@@ -89,7 +89,7 @@ $router->addRoute('POST', '/register', function () use ($userApi) {
 });
 
 
-#********** http://localhost/craydee-booking/api/router.php/logout **********#
+#********** http://localhost/craydee-booking/api/v1/router.php/logout **********#
 $router->addRoute('GET', '/logout', function () use ($userApi) {
     $userApi->logout();
 });
