@@ -11,6 +11,7 @@ require 'userApi.php';
 require 'notificationApi.php';
 require 'facilityApi.php';
 require 'bookingApi.php';
+require 'classesApi.php';
 // This class will handle the API responses and error messages
 
 // Router class handles the API requests
@@ -46,6 +47,7 @@ $userApi = new userApi($database); // Pass database connection to userApi
 $notificationApi = new notificationApi($database); // Pass database connection to notificationApi, this class handles sending out emails / notifications to users and staff
 $facilityApi = new facilityApi($database);
 $bookingApi = new bookingApi($database);
+$classesApi = new classesApi($database);
 // Add routes for different functionalities
 
 $router->addRoute('GET', '/test', function ()  {
@@ -150,7 +152,12 @@ $router->addRoute('POST', '/book', function () use ($bookingApi) {
     }
 });
 
+// classes API routes
 
+$router->addRoute('GET', '/classes', function () use ($classesApi) {
+    $classes = $classesApi->getClasses();
+    echo json_encode($classes);
+});
 
 // Handle the request
 $requestMethod = $_SERVER['REQUEST_METHOD'];

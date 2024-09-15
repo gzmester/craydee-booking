@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        .class-card {
+            margin-bottom: 20px;
+        }
+        .class-card img {
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .class-card-body {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row" id="classes-list">
+            <!-- Classes will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('http://localhost/craydee-booking/api/v1/router.php/classes')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('classes-list');
+                    container.innerHTML = data.map(classItem => {
+                        return `
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card class-card">
+                                    <img src="https://via.placeholder.com/600x200.png?text=${encodeURIComponent(classItem.class_name)}" class="card-img-top" alt="${classItem.class_name}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${classItem.class_name}</h5>
+                                        <p class="card-text">${classItem.description || 'No description available.'}</p>
+                                        <p class="card-text"><strong>Instructor ID:</strong> ${classItem.instructor_id}</p>
+                                        <p class="card-text"><strong>Max Participants:</strong> ${classItem.max_participants}</p>
+                                        <p class="card-text"><strong>Start Time:</strong> ${new Date(classItem.start_time).toLocaleString()}</p>
+                                        <p class="card-text"><strong>End Time:</strong> ${new Date(classItem.end_time).toLocaleString()}</p>
+                                        <p class="card-text"><small class="text-muted">Created at: ${new Date(classItem.created_at).toLocaleString()}</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                })
+                .catch(error => {
+                    console.error('Error fetching classes:', error);
+                });
+        });
+    </script>
+</body>
+</html>
