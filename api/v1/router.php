@@ -9,6 +9,7 @@ session_start(); // Start the session to access session variables
 require '../database.php';
 require 'userApi.php';
 require 'notificationApi.php';
+require 'facilityApi.php';
 // This class will handle the API responses and error messages
 
 // Router class handles the API requests
@@ -42,6 +43,8 @@ $database = new Database();
 
 $userApi = new userApi($database); // Pass database connection to userApi
 $notificationApi = new notificationApi($database); // Pass database connection to notificationApi, this class handles sending out emails / notifications to users and staff
+$facilityApi = new facilityApi($database);
+
 // Add routes for different functionalities
 
 $router->addRoute('GET', '/test', function ()  {
@@ -112,6 +115,19 @@ $router->addRoute('POST', '/register', function () use ($userApi) {
 $router->addRoute('GET', '/logout', function () use ($userApi) {
     $userApi->logout();
 });
+
+
+// facilities API routes
+
+#********** http://localhost/craydee-booking/api/v1/router.php/facilities **********#
+$router->addRoute('GET', '/facilities', function () use ($facilityApi) {
+   
+    $facilities = $facilityApi->getFacilities();
+    
+    echo json_encode($facilities);
+});
+
+
 
 // Handle the request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
