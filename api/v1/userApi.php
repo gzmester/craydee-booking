@@ -23,6 +23,7 @@ class userApi{
             if (password_verify($password, $user['password_hash'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
+                $_SESSION['logged_in'] = true;
                 return true;
             }
         }

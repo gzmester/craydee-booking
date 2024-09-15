@@ -7,7 +7,7 @@ document.getElementById('registrationForm').addEventListener('submit', function 
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
-    // Check if passwords match
+    // Check if passwords match does also check in the backend
     if (password !== confirmPassword) {
         alert('Passwords do not match.');
         return;

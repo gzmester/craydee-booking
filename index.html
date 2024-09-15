@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craydee Booking - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+        body {
+            background: #f8f9fa;
+            margin: 0;
+        }
+        .header {
+            background: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+        }
+        .header .nav-link {
+            color: #ffffff !important;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .calendar-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1>Craydee Booking System</h1>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html" id="loginLink">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="register.html" id="registerLink">Register</a>
+                    </li>
+                    <li class="nav-item" id="logoutLink" style="display: none;">
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Optional username display -->
+        <div id="usernameDisplay" class="text-center mb-4"></div>
+
+        <!-- Calendar Section -->
+        <div class="calendar-container">
+            <h2 class="text-center mb-4">Calendar</h2>
+            <div id="calendar" class="border rounded p-3">
+                <p>Calendar will be displayed here.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Courts</h5>
+                        <p class="card-text">Check out the available sports courts you can book.</p>
+                        <a href="courts.html" class="btn btn-primary">View Courts</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Join a Class</h5>
+                        <p class="card-text">Find and book classes such as yoga, zumba, and more.</p>
+                        <a href="classes.html" class="btn btn-primary">View Classes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-1d8E5dbK6b77HtFC0vXe5F2hPBzlhpN5aAoI4S7Eou6tEr+K8S5l6Bdd7/zBRP83" crossorigin="anonymous"></script>
+    <script src="js/auth.js?v=1"></script>
+</body>
+</html>

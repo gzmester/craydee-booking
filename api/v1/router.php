@@ -1,10 +1,11 @@
 <?php
 // allowing all the headers to be sent to the server and return in json, which is easier to work with in javascript
 header("Access-Control-Allow-Origin: *"); // Allow all origins
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow specific methods
+header("Access-Control-Allow-Methods: POST, GET, PUT, DEL, OPTIONS"); // Allow specific methods
 header("Access-Control-Allow-Headers: Content-Type"); // Allow specific headers
 header('Content-Type: application/json');
 error_reporting(E_ALL); // displaying errors if any
+session_start(); // Start the session to access session variables
 require '../database.php';
 require 'userApi.php';
 require 'notificationApi.php';
@@ -47,6 +48,23 @@ $router->addRoute('GET', '/test', function ()  {
   echo json_encode(array('message' => 'API is working'));   
 });
 
+#********** http://localhost/craydee-booking/api/v1/router.php/auth **********#
+$router->addRoute('GET', '/auth', function () {
+    // Check if the user is logged in
+    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+        $username = $_SESSION['username'];
+        echo json_encode([
+            'success' => true,
+            'loggedin' => true,
+            'username' => $username
+        ]);
+    } else {
+        echo json_encode([
+            'loggedin' => false
+        ]);
+    }
+});
+
 
 #********** http://localhost/craydee-booking/api/v1/router.php/login **********#
 $router->addRoute('POST', '/login', function () use ($userApi) {
@@ -66,6 +84,7 @@ $router->addRoute('POST', '/login', function () use ($userApi) {
     }
 });
 
+#********** http://localhost/craydee-booking/api/v1/router.php/register **********#
 $router->addRoute('POST', '/register', function () use ($userApi) {
     $data = json_decode(file_get_contents('php://input'), true);
 
