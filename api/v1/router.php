@@ -1,28 +1,14 @@
 <?php
 // allowing all the headers to be sent to the server and return in json, which is easier to work with in javascript
+header("Access-Control-Allow-Origin: *"); // Allow all origins
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow specific methods
+header("Access-Control-Allow-Headers: Content-Type"); // Allow specific headers
 header('Content-Type: application/json');
 error_reporting(E_ALL); // displaying errors if any
 require '../database.php';
 require 'userApi.php';
-
+require 'notificationApi.php';
 // This class will handle the API responses and error messages
-class ApiResponse {
-    public static function success($message, $data = []) {
-        http_response_code(200);
-        echo json_encode(array_merge(["message" => $message, "success" => true], $data));
-        exit;
-    }
-
-    public static function error($message, $code = 400, $data = []) {
-        http_response_code($code);
-        echo json_encode(array_merge(["message" => $message, "success" => false], $data));
-        exit;
-    }
-
-    public static function notFound() {
-        self::error("Not Found", 404);
-    }
-}
 
 // Router class handles the API requests
 class Router {
@@ -42,62 +28,66 @@ class Router {
                 }
             }
         }
+
         // Route not found
-        ApiResponse::notFound();
+        http_response_code(404);
+        echo "Not Found";
     }
 }
 
 // Initialize router and database classes
 $router = new Router();
 $database = new Database();
+
 $userApi = new userApi($database); // Pass database connection to userApi
 $notificationApi = new notificationApi($database); // Pass database connection to notificationApi, this class handles sending out emails / notifications to users and staff
 // Add routes for different functionalities
 
 $router->addRoute('GET', '/test', function ()  {
-    ApiResponse::success("Test successful");
+  echo json_encode(array('message' => 'API is working'));   
 });
+
 
 #********** http://localhost/craydee-booking/api/router.php/login **********#
 $router->addRoute('POST', '/login', function () use ($userApi) {
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (!isset($data['username'], $data['password'])) {
-        ApiResponse::error("Missing username or password", 400);
+        echo json_encode(array('success' => false, 'message' => 'Username and password are required'));
     }
 
     $username = $data['username'];
     $password = $data['password'];
 
     if ($userApi->login($username, $password)) {
-        ApiResponse::success("Login successful");
+        echo json_encode(array('success' => true, 'message' => 'Login successful'));
     } else {
-        ApiResponse::error("Login failed", 401);
+        echo json_encode(array('success' => false, 'message' => 'Login failed'));
     }
 });
 
-#********** http://localhost/craydee-booking/api/router.php/register **********#
 $router->addRoute('POST', '/register', function () use ($userApi) {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if($data['password'] !== $data['confirm_password']){
-        ApiResponse::error("Passwords do not match", 400);
-    }
-
-    if (!isset($data['username'], $data['email'], $data['password'])) {
-        ApiResponse::error("Missing username, email, or password", 400);
+    if ($data['password'] !== $data['confirm_password']) {
+        echo json_encode(array('success' => false, 'message' => 'Passwords do not match'));
     }
 
     $username = $data['username'];
     $email = $data['email'];
     $password = $data['password'];
+    //$csrf_token = $data['csrf_token'];
 
-    if ($userApi->register($username, $email, $password)) {
-        ApiResponse::success("Registration successful");
+    // Register the user
+    $result = $userApi->register($username, $email, $password);
+
+    if ($result) {
+         echo json_encode(array('success' => true, 'message' => 'Registration successful'));
     } else {
-        ApiResponse::error("Registration failed", 400);
+        echo json_encode(array('success' => false, 'message' => 'Registration failed'));
     }
 });
+
 
 #********** http://localhost/craydee-booking/api/router.php/logout **********#
 $router->addRoute('GET', '/logout', function () use ($userApi) {
