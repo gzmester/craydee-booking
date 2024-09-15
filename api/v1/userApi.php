@@ -14,7 +14,7 @@ class userApi{
     public function login($username, $password) // to include csrf token to prevent csrf attacks
     {
 
-        $sql = "SELECT id, username, password_hash FROM users WHERE username = ?";
+        $sql = "SELECT id, username, password_hash, role FROM users WHERE username = ?";
         $result = $this->conn->query($sql, $username);
 
         if ($result && $result->num_rows > 0) {
@@ -24,6 +24,7 @@ class userApi{
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['logged_in'] = true;
+                $_SESSION['role'] = $user['role'];
                 return true;
             }
         }
@@ -32,6 +33,7 @@ class userApi{
        
     }
 
+    // need to do some proper return messages here
     public function register($username, $email, $password) {
         // Check if username or email already exists
         if ($this->userExists($username, $email)) {
@@ -73,6 +75,6 @@ class userApi{
     {
         session_destroy();
         http_response_code(200);
-        echo "Logged out";
+        
     }
 }

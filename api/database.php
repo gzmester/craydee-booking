@@ -72,11 +72,11 @@ class Database {
     }
     
     
-
+    // Get the last insert ID
     public function getLastInsertId() {
         return $this->conn->insert_id;
     }
-
+    // Close the connection
     public function close() {
         $this->conn->close();
     }

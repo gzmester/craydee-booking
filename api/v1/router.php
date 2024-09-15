@@ -10,6 +10,7 @@ require '../database.php';
 require 'userApi.php';
 require 'notificationApi.php';
 require 'facilityApi.php';
+require 'bookingApi.php';
 // This class will handle the API responses and error messages
 
 // Router class handles the API requests
@@ -44,7 +45,7 @@ $database = new Database();
 $userApi = new userApi($database); // Pass database connection to userApi
 $notificationApi = new notificationApi($database); // Pass database connection to notificationApi, this class handles sending out emails / notifications to users and staff
 $facilityApi = new facilityApi($database);
-
+$bookingApi = new bookingApi($database);
 // Add routes for different functionalities
 
 $router->addRoute('GET', '/test', function ()  {
@@ -125,6 +126,28 @@ $router->addRoute('GET', '/facilities', function () use ($facilityApi) {
     $facilities = $facilityApi->getFacilities();
     
     echo json_encode($facilities);
+});
+
+
+// bookings API routes
+
+$router->addRoute('POST', '/book', function () use ($bookingApi) {
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    $facilityId = $data['facility_id'];
+    $startTime = $data['start_time'];
+    $endTime = $data['end_time'];
+    $price = $data['price'];
+    if (!$facilityId || !$startTime || !$endTime) {
+        echo json_encode(['success' => false, 'message' => 'Missing booking details']);
+        return;
+    }
+
+    if ($bookingApi->addBooking($_SESSION['user_id'], $facilityId, $startTime, $endTime, $price)) {
+        echo json_encode(['success' => true, 'message' => 'booking id: ' . $facilityId . ' ' . $startTime . ' ' . $endTime]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Booking failed']);
+    }
 });
 
 

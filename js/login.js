@@ -23,7 +23,7 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
     .then(result => {
         if (result.success) {
             // Handle successful login
-            
+            console.log(result.message);
             location.href = 'http://localhost/craydee-booking/index.html';
 
         } else {

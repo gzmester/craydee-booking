@@ -9,19 +9,50 @@ class facilityApi {
     {
         $this->conn = $conn;
     }
-
     public function getFacilities() {
-        $sql = "SELECT * FROM facilities";
+        // Define the SQL query
+        $sql = "SELECT f.facility_id, f.facility_name, f.description, f.facility_type, f.hourly_rate, f.created_at, 
+                       b.booking_start, b.booking_end 
+                FROM facilities f 
+                LEFT JOIN bookings b 
+                ON f.facility_id = b.facility_id 
+                AND b.booking_start >= CURDATE()";  // Only consider bookings from today onwards
+    
         $result = $this->conn->query($sql);
-
-        if ($result && $result->num_rows > 0) {
-            $facilities = $result->fetch_all(MYSQLI_ASSOC);
-            return $facilities;
+    
+        // array to store facilities
+        $facilities = [];
+    
+        // Populate facilities even if no bookings exist
+        while ($row = $result->fetch_assoc()) {
+            $facility_id = $row['facility_id'];
+    
+            // If this facility has not been added yet, add it
+            if (!isset($facilities[$facility_id])) {
+                $facilities[$facility_id] = [
+                    'facility_id' => $row['facility_id'],
+                    'facility_name' => $row['facility_name'],
+                    'description' => $row['description'],
+                    'facility_type' => $row['facility_type'],
+                    'hourly_rate' => $row['hourly_rate'],
+                    'created_at' => $row['created_at'],
+                    'bookings' => []  // Initialize empty bookings array
+                ];
+            }
+    
+            // Add booking information if it exists
+            if (!empty($row['booking_start']) && !empty($row['booking_end'])) {
+                $facilities[$facility_id]['bookings'][] = [
+                    'booking_start' => $row['booking_start'],
+                    'booking_end' => $row['booking_end']
+                ];
+            }
         }
-
-        return [];
+    
+        // Return facilities, even if they have no bookings
+        return array_values($facilities);
     }
-
+    
     public function getFacility($id) {
         $sql = "SELECT * FROM facilities WHERE id = ?";
         $result = $this->conn->query($sql, $id);

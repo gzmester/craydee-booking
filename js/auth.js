@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.getElementById('logoutLink').style.display = 'none';
                     }
                 } else {
-                    console.error('Failed to check authentication status');
+                    console.log('User not logged in');
                 }
             })
             .catch(error => {
