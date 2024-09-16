@@ -10,9 +10,11 @@ document.getElementById('logoutBtn').addEventListener('click', function (event) 
             if (response.ok) {
                 // User successfully logged out
                 console.log('User logged out');
-                // Redirect the user to the login page or any other desired page
-                // Replace 'login.html' with the actual login page URL
-                window.location.href = 'index.html';
+                showSuccessAlert('Logged out', 'You will be redirected to the login page.');
+                // Wait for 2 seconds before redirecting
+                setTimeout(() => {
+                    location.href = 'login.html';
+                }, 2000);
             } else {
                 // Failed to log out the user
                 console.error('Failed to log out the user');

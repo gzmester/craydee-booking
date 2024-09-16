@@ -35,8 +35,10 @@ document.getElementById('registrationForm').addEventListener('submit', function 
             // Handle successful registration
             alert('Registration successful!');
             // Redirect or perform actions after registration
+            location.href = 'login.html';
         } else {
             // Handle failed registration
+            console.log(result);
             alert('Registration failed: ' + result.message);
         }
     })

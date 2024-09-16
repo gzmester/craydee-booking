@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('http://localhost/craydee-booking/api/v1/router.php/facilities')
         .then(response => response.json())
         .then(data => {
+
+              // Check if data is empty or no facilities available
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-warning" role="alert">
+                        No available training facilities at the moment. Please check back later or try again tomorrow.
+                    </div>
+                `;
+                return;
+            }
             container.innerHTML = data.map(facility => {
                 const availableTimes = Array.from({ length: 11 }, (_, i) => `${8 + i}:00`);
 
@@ -35,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 data-facility-id="${facility.facility_id}" 
                                 data-time="${timeSlotStart}" 
                                 data-end-time="${timeSlotEnd}" 
+                                data-price="${facility.hourly_rate}"
                                 ${isBooked ? 'disabled' : ''}>
                             ${timeSlotStart}
                         </button>
@@ -42,8 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }).join('');
 
                 return `
-                    <div class="facility-card mb-4">
-                        <img src="https://via.placeholder.com/600x200.png?text=${encodeURIComponent(facility.facility_name)}" alt="${facility.facility_name}">
+                    <div class="facility-card mb-4 shadow p-3 mb-5 bg-body rounded">
+                        <img src="https://crowall.ca/wp-content/uploads/2024/02/tennis-court-dimensions.webp?text=${encodeURIComponent(facility.facility_name)}" alt="${facility.facility_name}">
                         <div class="facility-card-body">
                             <h5 class="card-title">${facility.facility_name}</h5>
                             <p class="card-text">${facility.description || 'No description available.'}</p>
@@ -80,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const fullEndTime = `${today} ${endTime}:00`;
 
                 const facilityCard = this.closest('.facility-card');
-                const price = facilityCard.getAttribute('data-price');
+                const price = this.getAttribute('data-price');
 
                 const bookButton = document.querySelector(`.btn-book[data-facility-id="${facilityId}"]`);
                 bookButton.removeAttribute('disabled');
@@ -119,8 +130,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
-                            alert('Booking successful! ' + result.message);
-                            location.reload();
+                            showSuccessAlert('Booking successful!', result.message);
+                            // wait 2 seconds before reloading the page
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
                         } else {
                             alert('Booking failed: ' + result.message);
                         }

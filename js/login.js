@@ -24,8 +24,11 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         if (result.success) {
             // Handle successful login
             console.log(result.message);
-            location.href = 'http://localhost/craydee-booking/index.html';
-
+            showSuccessAlert('Login successful!', 'You will be redirected to the homepage.');
+            // wait for 2 seconds before redirecting
+            setTimeout(() => {
+                location.href = 'http://localhost/craydee-booking/index.html';
+            }, 2000);
         } else {
             // Handle failed login
             alert('Login failed: ' + result.message);

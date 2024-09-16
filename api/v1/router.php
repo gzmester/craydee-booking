@@ -4,14 +4,16 @@ header("Access-Control-Allow-Origin: *"); // Allow all origins
 header("Access-Control-Allow-Methods: POST, GET, PUT, DEL, OPTIONS"); // Allow specific methods
 header("Access-Control-Allow-Headers: Content-Type"); // Allow specific headers
 header('Content-Type: application/json');
-error_reporting(E_ALL); // displaying errors if any
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start(); // Start the session to access session variables
-require '../database.php';
-require 'userApi.php';
-require 'notificationApi.php';
-require 'facilityApi.php';
-require 'bookingApi.php';
-require 'classesApi.php';
+require __DIR__ . '/../database.php';
+require __DIR__ . '/userApi.php';
+require __DIR__ . '/notificationApi.php';
+require __DIR__ . '/facilityApi.php';
+require __DIR__ . '/bookingApi.php';
+require __DIR__ . '/classesApi.php';
 // This class will handle the API responses and error messages
 
 // Router class handles the API requests
@@ -50,8 +52,9 @@ $bookingApi = new bookingApi($database);
 $classesApi = new classesApi($database);
 // Add routes for different functionalities
 
-$router->addRoute('GET', '/test', function ()  {
+$router->addRoute('GET', '/test', function () use ($userApi)  {
   echo json_encode(array('message' => 'API is working'));   
+
 });
 
 #********** http://localhost/craydee-booking/api/v1/router.php/auth **********#
