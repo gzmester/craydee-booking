@@ -75,7 +75,30 @@ $router->addRoute('GET', '/auth', function () {
 });
 
 
-#********** http://localhost/craydee-booking/api/v1/router.php/login **********#
+$router->addRoute('GET', '/user', function () use ($userApi) {
+    // Check if the user is logged in
+    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+        // Get the user ID from the session
+        $userId = $_SESSION['user_id'];
+
+        // Fetch user data from the User API (or database)
+        $userData = $userApi->getUserById($userId); 
+
+        // Return the user data as JSON
+        echo json_encode([
+            'success' => true,
+            'data' => $userData
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'User data cant be fetched since the user isnt logged in'
+        ]);
+    }
+});
+
+
+#********** http://localhost/craydee-booking/api/v1/router.php/user **********#
 $router->addRoute('POST', '/login', function () use ($userApi) {
     $data = json_decode(file_get_contents('php://input'), true);
 

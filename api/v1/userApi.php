@@ -70,6 +70,70 @@ class userApi{
         
         return false; // User does not exist
     }
+
+    public function getUserById($id) {
+        $sql = "SELECT 
+        u.id, u.username, u.email, u.role,
+        
+        -- Booking Details
+        b.booking_id, b.booking_start, b.booking_end, b.total_cost,
+        f.facility_id, f.facility_name,
+
+        -- Class Registration Details
+        cr.registration_id, cr.registration_date,
+        c.class_id, c.class_name, c.description, c.start_time, c.end_time, c.max_participants
+        
+    FROM users u
+    
+    -- Join with bookings and facilities
+    LEFT JOIN bookings b ON u.id = b.user_id
+    LEFT JOIN facilities f ON b.facility_id = f.facility_id
+    
+    -- Join with class registrations and classes
+    LEFT JOIN class_registrations cr ON u.id = cr.user_id
+    LEFT JOIN classes c ON cr.class_id = c.class_id
+    
+    WHERE u.id = ?";
+            
+        $result = $this->conn->query($sql, $id);
+       
+    
+        if ($result && $result->num_rows > 0) {
+            $userData = [];
+            
+            // Fetch all related data
+            while ($row = $result->fetch_assoc()) {
+                $userData['id'] = $row['id'];
+                $userData['username'] = $row['username'];
+                $userData['email'] = $row['email'];
+                $userData['role'] = $row['role'];
+                
+                // Collect class registrations
+                $userData['class_registrations'][] = [
+                    'registration_id' => $row['registration_id'],
+                    'class_name' => $row['class_name'],
+                    'description' => $row['description'],
+                    'start_time' => $row['start_time'],
+                    'end_time' => $row['end_time'],
+                    'max_participants' => $row['max_participants'],
+                    'registration_date' => $row['registration_date']
+                ];
+                
+                // Collect bookings
+                $userData['bookings'][] = [
+                    'booking_id' => $row['booking_id'],
+                    'facility_name' => $row['facility_name'],
+                    'booking_start' => $row['booking_start'],
+                    'booking_end' => $row['booking_end'],
+                    'total_cost' => $row['total_cost']
+                ];
+            }
+            return $userData;
+        } else {
+            return null;
+        }
+    }
+    
     
     public function logout()
     {

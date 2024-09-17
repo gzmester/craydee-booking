@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Page</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Font Awesome CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="../js/alerts.js"></script>
+  <style>
+    body {
+      background-color: #f7f7f7;
+    }
+    .card {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 0.75rem;
+    }
+    .profile-header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      border-radius: 0.75rem 0.75rem 0 0;
+      text-align: center;
+    }
+    .btn-custom {
+      background-color: #007bff;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    .btn-custom:hover {
+      background-color: #0056b3;
+    }
+    .form-control:focus {
+      box-shadow: none;
+      border-color: #007bff;
+    }
+    .booking-card {
+      margin-bottom: 1rem;
+      background-color: #fff;
+      border-radius: 0.75rem;
+    }
+    .card-body .booking-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-body .booking-details p {
+      margin: 0;
+    }
+    .password-reset-section {
+      padding: 20px;
+      background-color: #e9ecef;
+      border-radius: 0.75rem;
+    }
+    .password-reset-section h6 {
+      margin-bottom: 1rem;
+    }
+    .icon-section i {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="profile-header">
+          <h5 id="profile-username">Loading...</h5>
+          <p><i class="fas fa-envelope"></i> <span id="profile-email">Loading...</span></p>
+        </div>
+        <div class="card-body text-center">
+          <h6><i class="fas fa-info-circle"></i> About</h6>
+          <p>Manage your sports facility and class bookings here. View upcoming events and reset your password easily.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Profile Section -->
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-body">
+          <!-- Upcoming Bookings Section -->
+          <h6 class="text-primary mb-3"><i class="fas fa-calendar-alt"></i> Upcoming Bookings</h6>
+          <div id="upcoming-bookings">
+            <!-- Bookings will be dynamically populated here -->
+          </div>
+          <div id="upcoming-classes">
+            <!-- classes will be dynamically populated here -->
+          </div>
+        <!-- Password Reset Section -->
+        <h6 class="text-primary mt-4"><i class="fas fa-key"></i> Reset Password</h6>
+        <div class="password-reset-section">
+        <h6>Update Your Password</h6>
+        <div class="row icon-section">
+            <div class="col-md-6">
+            <div class="mb-3">
+                <label for="newPassword" class="form-label"><i class="fas fa-lock"></i> New Password</label>
+                <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+            </div>
+            </div>
+            <div class="col-md-6">
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label"><i class="fas fa-lock"></i> Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-secondary me-2"><i class="fas fa-ban"></i> Cancel</button>
+            <button type="button" class="btn btn-custom"><i class="fas fa-save"></i> Update Password</button>
+        </div>
+        </div>
+
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Bootstrap and Font Awesome Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    <!-- API Fetch Script -->
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch user data from API
+    fetch('http://localhost/craydee-booking/api/v1/router.php/user', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success === false) {
+            // User is not logged in or doesn't have permission
+            showErrorAlert('NoNo', 'You are not authorized to view this page.');
+            setTimeout(() => {
+                window.location.href = 'login.html'; // Redirect to login or error page
+            }, 1500); // 1.5 seconds delay before redirect
+        } else {
+            // Populate profile info
+            document.getElementById('profile-username').textContent = data.data.username;
+            document.getElementById('profile-email').textContent = data.data.email;
+
+            // Populate upcoming bookings
+            const bookingsContainer = document.getElementById('upcoming-bookings');
+            if (bookingsContainer) {
+                bookingsContainer.innerHTML = ''; // Clear existing bookings
+
+                if (data.data.bookings && data.data.bookings.length > 0) {
+                    data.data.bookings.forEach(booking => {
+                        const bookingCard = `
+                            <div class="card booking-card">
+                                <div class="card-body booking-details">
+                                    <div>
+                                        <h6>${booking.facility_name}</h6>
+                                        <p><i class="fas fa-clock"></i> ${new Date(booking.booking_start).toLocaleTimeString()} - ${new Date(booking.booking_end).toLocaleTimeString()}, ${new Date(booking.booking_start).toLocaleDateString()}</p>
+                                    </div>
+                                    <button class="btn btn-danger btn-sm"><i class="fas fa-times-circle"></i> Cancel</button>
+                                </div>
+                            </div>`;
+                        bookingsContainer.innerHTML += bookingCard;
+                    });
+                } else {
+                    bookingsContainer.innerHTML = '<p>No upcoming bookings.</p>';
+                }
+            } else {
+                console.error('Bookings container not found');
+            }
+
+            // Populate class registrations
+            const classesContainer = document.getElementById('upcoming-classes');
+            if (classesContainer) {
+                classesContainer.innerHTML = ''; // Clear existing classes
+
+                if (data.data.class_registrations && data.data.class_registrations.length > 0) {
+                    data.data.class_registrations.forEach(registration => {
+                        if (registration.class_name) { // Only show valid registrations
+                            const classCard = `
+                                <div class="card class-card">
+                                    <div class="card-body">
+                                        <h6>${registration.class_name}</h6>
+                                        <p><i class="fas fa-calendar-alt"></i> ${new Date(registration.start_time).toLocaleDateString()} - ${new Date(registration.end_time).toLocaleDateString()}</p>
+                                        <p>${registration.description}</p>
+                                        <p><i class="fas fa-users"></i> Max Participants: ${registration.max_participants}</p>
+                                        <p><i class="fas fa-calendar-check"></i> Registered on: ${new Date(registration.registration_date).toLocaleDateString()}</p>
+                                    </div>
+                                </div>`;
+                            classesContainer.innerHTML += classCard;
+                        }
+                    });
+                } else {
+                    classesContainer.innerHTML = '<p>No class registrations.</p>';
+                }
+            } else {
+                console.error('Classes container not found');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching user data:', error);
+        showErrorAlert('An error occurred while fetching user data.');
+    });
+});
+
+    </script>
+</body>
+</html>
