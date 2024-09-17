@@ -79,4 +79,15 @@ class classesApi{
         }
     }
 
+    public function registerForClass($user_id, $class_id) {
+        $sql = "INSERT INTO class_registrations (user_id, class_id, registration_date) VALUES (?, ?, CURDATE())";
+        $result = $this->conn->query($sql, $user_id, $class_id);
+
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

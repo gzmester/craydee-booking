@@ -74,7 +74,7 @@ $router->addRoute('GET', '/auth', function () {
     }
 });
 
-
+#********** http://localhost/craydee-booking/api/v1/router.php/user **********#
 $router->addRoute('GET', '/user', function () use ($userApi) {
     // Check if the user is logged in
     if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
@@ -158,7 +158,7 @@ $router->addRoute('GET', '/facilities', function () use ($facilityApi) {
 
 
 // bookings API routes
-
+#********** http://localhost/craydee-booking/api/v1/router.php/book **********#
 $router->addRoute('POST', '/book', function () use ($bookingApi) {
     $data = json_decode(file_get_contents('php://input'), true);
 
@@ -178,12 +178,103 @@ $router->addRoute('POST', '/book', function () use ($bookingApi) {
     }
 });
 
-// classes API routes
+// get bookings
+#********** http://localhost/craydee-booking/api/v1/router.php/bookings **********#
+$router->addRoute('GET', '/bookings', function () use ($bookingApi) {
+    $bookings = $bookingApi->getBookings();
+    echo json_encode($bookings);
+});
 
+
+// classes API routes
+#********** http://localhost/craydee-booking/api/v1/router.php/classes **********#
 $router->addRoute('GET', '/classes', function () use ($classesApi) {
     $classes = $classesApi->getClasses();
     echo json_encode($classes);
 });
+
+// register for a class
+#********** http://localhost/craydee-booking/api/v1/router.php/register-class **********#
+$router->addRoute('POST', '/register-class', function () use ($classesApi) {
+    if(!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+        echo json_encode(['success' => false, 'message' => 'You must be logged in to register for a class']);
+        exit;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    $classId = $data['class_id'];
+
+    if (!$classId) {
+        echo json_encode(['success' => false, 'message' => 'Missing class id']);
+        return;
+    }
+
+    if ($classesApi->registerForClass($_SESSION['user_id'], $classId)) {
+        echo json_encode(['success' => true, 'message' => 'Registered for class']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Registration failed']);
+    }
+
+});
+
+// add a new class for members
+
+#********** http://localhost/craydee-booking/api/v1/router.php/add-class **********#
+$router->addRoute('POST', '/add-class', function () use ($classesApi) {
+    if(!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true && $_SESSION['role'] !== 'instructor') {
+        echo json_encode(['success' => false, 'message' => 'You must be logged in to add a class, and have a member role of instructor']);
+        exit;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = $data['class_name'];
+    $description = $data['description'];
+    $instructorId = $_SESSION['user_id'];
+    $max_participants = $data['max_participants'];
+
+    if (!$name || !$description || !$instructorId || !$max_participants) {
+        echo json_encode(['success' => false, 'message' => 'Missing class details']);
+        return;
+    }
+
+    if ($classesApi->addClass($name, $description, $instructorId, $max_participants)) {
+        echo json_encode(['success' => true, 'message' => 'Class added']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to add class']);
+    }
+});
+
+
+// update a class for members
+#********** http://localhost/craydee-booking/api/v1/router.php/update-class **********#
+$router->addRoute('PUT', '/update-class', function () use ($classesApi) {
+    if(!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true && $_SESSION['role'] !== 'instructor') {
+        echo json_encode(['success' => false, 'message' => 'You must be logged in to update a class, and have a member role of instructor']);
+        exit;
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $classId = $data['class_id'];
+    $name = $data['class_name'];
+    $description = $data['description'];
+    $instructorId = $_SESSION['user_id'];
+    $max_participants = $data['max_participants'];
+
+    if (!$classId || !$name || !$description || !$instructorId || !$max_participants) {
+        echo json_encode(['success' => false, 'message' => 'Missing class details']);
+        return;
+    }
+
+    if ($classesApi->updateClass($classId, $name, $description, $instructorId, $max_participants)) {
+        echo json_encode(['success' => true, 'message' => 'Class updated']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update class']);
+    }
+});
+
+
+
 
 // Handle the request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
